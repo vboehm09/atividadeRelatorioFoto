@@ -1,6 +1,28 @@
 import AlunoModel from '../models/AlunoModel.js';
 import { gerarPdfTodos, gerarPdfAluno } from '../utils/pdfHelper.js';
 
+export const relatorioTodos = async (req, res) => {
+    try {
+        const alunos = await AlunoModel.buscarTodos();
+
+        if (!alunos || alunos.length === 0) {
+            return res.status(404).json({ error: 'Nenhum aluno encontrado!' });
+        }
+
+        const pdf = await gerarPdfTodos(alunos);
+
+        return res
+            .set({
+                'Content-Type': 'application/pdf',
+                'Content-Disposition': `inline; filename="alunos_relatorio.pdf"`,
+            })
+            .send(pdf);
+    } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        return res.status(500).json({ error: 'Erro ao gerar relatório.' });
+    }
+};
+
 export const relatorioPorId = async (req, res) => {
     try {
         const { id } = req.params;

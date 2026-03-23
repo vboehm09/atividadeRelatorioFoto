@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import AlunoModel from '../models/AlunoModel.js';
 import { processarFoto, removerFoto } from '../utils/fotoHelper.js';
 
-export const verFoto = async (req, res) => {
+export const buscarPorId = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -13,15 +13,16 @@ export const verFoto = async (req, res) => {
         const aluno = await AlunoModel.buscarPorId(parseInt(id));
 
         if (!aluno) {
-            return res.status(404).json({ error: 'Registro de aluno não encontrada.' });
+            return res.status(404).json({ error: 'Aluno não encontrado.' });
         }
         if (!aluno.foto) {
-            return res.status(404).json({ error: 'Foto de aluno não encontrada.' });
+            return res.status(404).json({ error: 'Este não possui foto cadastrada.' });
         }
-        return res.sendFile(aluno.foto, { root: './uploads' });
+
+        return res.sendFile(aluno.foto, { root: '.' }); /* procure  a foto na raiz(.) */
     } catch (error) {
-        console.error('Erro ao buscar foto:', error);
-        res.status(500).json({ error: 'Erro ao buscar foto.' });
+        console.error('Erro ao buscar:', error);
+        return res.status(500).json({ error: 'Erro ao buscar foto.' });
     }
 };
 
